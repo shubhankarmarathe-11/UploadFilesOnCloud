@@ -6,6 +6,9 @@ import path from "node:path";
 export default defineConfig({
   server: {
     host: true,
+    proxy: {
+      "/api/": "http://localhost:3000",
+    },
   },
   plugins: [react()],
   resolve: {

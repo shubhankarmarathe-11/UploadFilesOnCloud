@@ -10,46 +10,24 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { Progress } from "@/components/ui/progress";
+import { useState, useRef, useEffect } from "react";
+import { Toaster } from "react-hot-toast";
+import ToastFun from "@/components/Toast";
+
+import axios from "axios";
+import { useLoggedIn } from "@/Store/authStore";
+import { useNavigate } from "react-router-dom";
 
 const Upload_Files = () => {
-  const filesData = [
-    {
-      _id: 1,
-      filename: "project-report.pdf",
-      type: "PDF",
-      datetime: "2026-02-25 10:30 AM",
-      size: "2.4 MB",
-    },
-    {
-      _id: 2,
-      filename: "profile-photo.png",
-      type: "Image",
-      datetime: "2026-02-24 04:15 PM",
-      size: "1.2 MB",
-    },
-    {
-      _id: 3,
-      filename: "lecture-notes.docx",
-      type: "Document",
-      datetime: "2026-02-23 09:05 AM",
-      size: "856 KB",
-    },
-    {
-      _id: 4,
-      filename: "demo-video.mp4",
-      type: "Video",
-      datetime: "2026-02-22 07:40 PM",
-      size: "24.8 MB",
-    },
-    {
-      _id: 5,
-      filename: "archive-backup.zip",
-      type: "Archive",
-      datetime: "2026-02-21 01:20 PM",
-      size: "12.6 MB",
-    },
-  ];
+  const islogged = useLoggedIn((s) => s.islogged);
+  const setLoggedIn = useLoggedIn((s) => s.setLoggedIn);
+
+  const [progress, SetProgress] = useState(0);
+
+  const Navigation = useNavigate();
+
+  const [filesData, SetfilesData] = useState<[]>([]);
 
   const [FileArray, SetFileArray] = useState<FileList | null>();
 
@@ -57,13 +35,92 @@ const Upload_Files = () => {
     SetFileArray(e.target.files);
   };
 
+  const fileRef = useRef<HTMLInputElement | null>(null);
+
+  async function AccessToken() {
+    await axios
+      .get("/api/global/refresh", { withCredentials: true })
+      .then((res) => {
+        if (res.status == 201) {
+          UploadFileFun();
+        }
+      })
+
+      .catch((err) => {
+        if (err.response.status == 401) {
+          setLoggedIn(false);
+          Navigation("/login");
+        }
+      });
+  }
+
+  async function UploadFileFun() {
+    const formData = new FormData();
+    if (FileArray == null || FileArray == undefined)
+      return ToastFun({ type: "error", message: "please select file first" });
+
+    for (let val of FileArray) {
+      console.log(val);
+      formData.append("file", val);
+
+      await axios
+        .post("/api/file/uploadfile", formData, {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentage = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total,
+            );
+            SetProgress(percentage);
+          },
+        })
+        .then((res) => {
+          if (res.status == 201) {
+            ToastFun({ type: "success", message: res.data });
+            formData.delete("file");
+            SetProgress(0);
+          }
+          SetProgress(0);
+        })
+        .catch((err) => {
+          console.log(err.response.status);
+
+          if (err.response.status == 401) {
+            AccessToken();
+          }
+        });
+    }
+    if (fileRef.current) {
+      fileRef.current.value = "";
+    }
+    SetFileArray(null);
+  }
+
+  async function FetchFilesData() {
+    await axios
+      .get("/api/file/fetchfiles", { withCredentials: true })
+      .then((res) => {
+        console.log(res.data.data);
+        SetfilesData(res.data.data);
+      })
+      .catch((err) => {});
+  }
+
+  useEffect(() => {
+    FetchFilesData();
+  }, []);
+
   return (
     <>
+      <Toaster />
       <div className="flex-1 flex flex-col justify-center items-center w-full my-5">
         <h2 className="text-2xl font-bold mb-6">Upload Your Files</h2>
         <form
           onSubmit={(e) => {
             e.preventDefault();
+            UploadFileFun();
           }}
           encType="multipart/form-data"
         >
@@ -71,6 +128,7 @@ const Upload_Files = () => {
             <FieldLabel htmlFor="picture">Files</FieldLabel>
             <Input
               id="picture"
+              ref={fileRef}
               type="file"
               multiple={true}
               onChange={OnChangeFileInput}
@@ -81,6 +139,13 @@ const Upload_Files = () => {
             Upload
           </Button>
         </form>
+        <div className="w-[60%] ">
+          <h3 className="text-left">Uploading Progress</h3>
+          <span className="flex gap-2 justify-center items-center">
+            <Progress value={progress} className="w-full" />
+            <h3>{progress}%</h3>
+          </span>
+        </div>
       </div>
       <div className="flex-1 flex flex-col  w-full my-10">
         <h2 className="text-left text-2xl my-3">Recent Uploads</h2>
@@ -98,8 +163,10 @@ const Upload_Files = () => {
             {filesData.map((val) => {
               return (
                 <TableRow key={val._id}>
-                  <TableCell className="font-medium">{val.filename}</TableCell>
-                  <TableCell>{val.type}</TableCell>
+                  <TableCell className="font-medium">
+                    {val.originalname}
+                  </TableCell>
+                  <TableCell>{val.mimetype}</TableCell>
                   <TableCell>{val.datetime}</TableCell>
                   <TableCell className="text-right">{val.size}</TableCell>
                 </TableRow>

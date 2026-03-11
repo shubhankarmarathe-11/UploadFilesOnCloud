@@ -13,10 +13,12 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import axios from "axios";
 import ToastFun from "@/components/Toast";
+import { Spinner } from "@/components/ui/spinner";
+import { useLoggedIn } from "@/Store/authStore";
 
 const Register = () => {
   const [Cred, SetCred] = useState({
@@ -27,25 +29,76 @@ const Register = () => {
   });
   const [show, Setshow] = useState(false);
 
+  const Navigate = useNavigate();
+
   const SubmitForm = async () => {
     await axios
-      .post("/api/register", {
+      .post("/api/auth/signup", {
         name: Cred.name,
         email: Cred.email,
-        number: Cred.number,
+        mob: Cred.number,
         password: Cred.password,
       })
-      .then((res) => {})
+      .then((res) => {
+        if (res.status == 201) {
+          setLoading(true);
+          ToastFun({ type: "success", message: res.data });
+          setLoggedIn(true);
+          setTimeout(() => {
+            Navigate("/dashboard");
+          }, 2000);
+        }
+      })
       .catch((err) => {
         console.log(err);
 
-        if (err.response.status == 404) {
-          ToastFun({ type: "error", message: "Server not found" });
+        return ToastFun({ type: "error", message: err.response.data });
+      });
+  };
+
+  const islogged = useLoggedIn((s) => s.islogged);
+  const setLoggedIn = useLoggedIn((s) => s.setLoggedIn);
+  const [Loading, setLoading] = useState(true);
+
+  const [refresh, Setrefresh] = useState(true);
+
+  const FetchIsLoggedIn = async () => {
+    await axios
+      .get("/api/global/isLoggedin", { withCredentials: true })
+      .then((res) => {
+        if (res.status == 200) {
+          setLoggedIn(true);
+          Setrefresh(!refresh);
+        }
+      })
+      .catch((err) => {
+        if (err.response.status == 409) {
+          setLoggedIn(false);
+          setLoading(false);
         }
       });
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    console.log(islogged);
+
+    if (!islogged) {
+      FetchIsLoggedIn();
+    } else {
+      Navigate("/dashboard");
+    }
+  }, [refresh]);
+
+  if (Loading)
+    return (
+      <>
+        <Toaster />
+        <div className="flex-1 h-screen flex items-center justify-center gap-6">
+          <Spinner className="size-16" />
+        </div>
+      </>
+    );
+
   return (
     <>
       <Toaster />
