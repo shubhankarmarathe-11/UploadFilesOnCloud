@@ -173,7 +173,7 @@ Files are stored **on the server filesystem** inside the uploads directory and m
 
 # Author
 
-**Shubhamkar Marathe**
+**Shubhankar Marathe**
 
 BCA Student | Full Stack Developer
 
