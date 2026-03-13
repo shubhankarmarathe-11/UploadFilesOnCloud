@@ -2,23 +2,60 @@ import { UserFileConnection } from "../User/user.model.js";
 import { UpdateStorageLimit } from "../User/user.services.js";
 import { RedisCli } from "../../RedisConnection.js";
 
-const UploadFileModel = async ({ userId, filedata }) => {
+const UpdateModelAfterDelete = async ({ userId, fileid, RToken, filesize }) => {
   try {
+    let FileModel = await UserFileConnection.updateOne(
+      { UserId: userId },
+      { $pull: { Files: { _fileid: fileid } } },
+    );
+
+    let Update = await UpdateStorageLimit({
+      userId: userId,
+      filesize: filesize,
+      RToken: RToken,
+      operation: "",
+    });
+
+    console.log(Update);
+
+    await RedisCli.del(`${userId}_FilesData`);
+
+    return 200;
+  } catch (error) {
+    console.log(error);
+
+    return null;
+  }
+};
+
+const UploadFileModel = async ({ userId, filedata, RToken }) => {
+  try {
+    let date = new Date();
+
     let CreateFileModel = await UserFileConnection.updateOne(
       { UserId: userId },
-      { $push: { Files: filedata } },
+      {
+        $push: {
+          Files: {
+            Data: filedata,
+            DateTime: `${date.toDateString()} - ${date.toTimeString()}`,
+          },
+        },
+      },
     );
 
     if (CreateFileModel.modifiedCount == 1) {
       let Update = await UpdateStorageLimit({
         userId: userId,
         filesize: filedata.size,
+        RToken: RToken,
+        operation: "upload",
       });
 
       if (Update == 404) {
         await UserFileConnection.updateOne(
           { UserId: userId },
-          { $pop: { Files } },
+          { $pull: { Files: { Data: filedata } } },
         );
 
         return 400;
@@ -50,4 +87,4 @@ const RetriveUploadedFiles = async ({ userId }) => {
   }
 };
 
-export { UploadFileModel, RetriveUploadedFiles };
+export { UploadFileModel, RetriveUploadedFiles, UpdateModelAfterDelete };

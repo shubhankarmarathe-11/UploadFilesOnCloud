@@ -1,6 +1,10 @@
 import { RedisCli } from "../../RedisConnection.js";
 import multer from "multer";
-import { UploadFileModel, RetriveUploadedFiles } from "./file.services.js";
+import {
+  UploadFileModel,
+  RetriveUploadedFiles,
+  UpdateModelAfterDelete,
+} from "./file.services.js";
 import fs from "fs";
 import path from "path";
 
@@ -41,12 +45,13 @@ const FileUploadController = async (req, res) => {
       let UpdateInDb = await UploadFileModel({
         userId: result._id,
         filedata: req.file,
+        RToken: RToken,
       });
 
       if (UpdateInDb == null || UpdateInDb == 400) {
         const filePath = path.join(
           __dirname,
-          `../../../uploads/${req.file.filename}`,
+          `../../../uploads/${result._id}/${req.file.filename}`,
         );
 
         await fs.promises.rm(filePath, { force: true });
@@ -87,4 +92,40 @@ const FetchFilesController = async (req, res) => {
   }
 };
 
-export { FileUploadController, FetchFilesController };
+const DeleteFileController = async (req, res) => {
+  try {
+    const RToken = req.cookies.host_auth_refresh;
+    let { fileid, filename, filesize } = req.params;
+
+    console.log(fileid);
+
+    let result = JSON.parse(await RedisCli.get(String(RToken)));
+
+    let UpdateInDb = await UpdateModelAfterDelete({
+      userId: result._id,
+      fileid: fileid,
+      filesize: filesize,
+      RToken: RToken,
+    });
+
+    console.log(UpdateInDb);
+
+    if (UpdateInDb == null || UpdateInDb == 400)
+      return res.status(400).send("please try again *");
+
+    const filePath = path.join(
+      __dirname,
+      `../../../uploads/${result._id}/${filename}`,
+    );
+
+    await fs.promises.rm(filePath, { force: true });
+
+    return res.status(200).send("file Removed ");
+  } catch (error) {
+    console.log(error);
+
+    return res.status(400).send("please try again");
+  }
+};
+
+export { FileUploadController, FetchFilesController, DeleteFileController };

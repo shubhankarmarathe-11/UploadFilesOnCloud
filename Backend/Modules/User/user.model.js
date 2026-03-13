@@ -6,7 +6,22 @@ const FileAndUserConnection = new mongoose.Schema({
     ref: "userdetail",
     required: true,
   },
-  Files: [{}],
+  Files: [
+    {
+      _fileid: {
+        type: Schema.Types.ObjectId,
+        default: () => new mongoose.Types.ObjectId(),
+      },
+      Data: {
+        type: Object,
+        default: {},
+      },
+      DateTime: {
+        type: String,
+        default: "",
+      },
+    },
+  ],
 });
 
 const UserDetails = new mongoose.Schema({
@@ -21,12 +36,25 @@ const UserDetails = new mongoose.Schema({
   },
   Number: {
     type: String,
-    required: true,
     unique: true,
   },
   Password: {
     type: String,
-    required: true,
+    default: "",
+  },
+
+  GoogleId: {
+    type: String,
+    default: "",
+  },
+  ProfileUrl: {
+    type: String,
+    default: "",
+  },
+
+  GoogleId: {
+    type: String,
+    default: "",
   },
 
   UserConnectionId: {
@@ -46,6 +74,8 @@ const UserDetails = new mongoose.Schema({
     required: true,
   },
 });
+
+FileAndUserConnection.index({ "Files._fileid": 1 });
 
 const UserDetail = mongoose.model("userdetail", UserDetails);
 const UserFileConnection = mongoose.model(

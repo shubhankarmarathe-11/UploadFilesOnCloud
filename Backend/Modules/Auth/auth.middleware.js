@@ -1,4 +1,9 @@
 import { RedisCli } from "../../RedisConnection.js";
+import { validateGoogleToken } from "../../utils/Validate0AuthToken.js";
+import { FindUserWithEmail } from "../User/user.services.js";
+import { SignToken } from "../../utils/TokenOperations.js";
+
+const bytesToMB = (bytes) => (bytes / (1024 * 1024)).toFixed(2);
 
 async function LoginMiddleware(req, res, next) {
   try {
@@ -58,4 +63,63 @@ async function SignupMiddleware(req, res, next) {
   }
 }
 
-export { LoginMiddleware, SignupMiddleware };
+const GoogleMiddleware = async (req, res, next) => {
+  try {
+    let { google_token } = req.body;
+
+    let r = await validateGoogleToken(google_token);
+
+    if (r == false) return res.status(401).send("invalid token");
+
+    const payload = r.getPayload();
+    const { email } = payload;
+
+    let fetch = await FindUserWithEmail({ Email: String(email) });
+
+    req.payload = payload;
+
+    if (fetch == null) return res.status(400).send("please try again");
+    if (fetch == 404) return next();
+
+    let { Atoken, Rtoken } = await SignToken(String(fetch._id));
+
+    if (Atoken == undefined || Rtoken == undefined)
+      return res.status(400).send("please try again");
+
+    res.cookie("host_auth_access", Atoken, {
+      path: "/",
+      maxAge: 60 * 60 * 1000,
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+    });
+    res.cookie("host_auth_refresh", Rtoken, {
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+    });
+
+    await RedisCli.set(
+      `${Rtoken}`,
+      JSON.stringify({
+        _id: fetch._id,
+        name: fetch.Name,
+        email: fetch.Email,
+        mob: fetch.Number,
+        profileimg: fetch.ProfileUrl,
+        storage_used: await bytesToMB(fetch.storage_used_bytes),
+        storage_remain: await bytesToMB(fetch.Storagelimit_bytes),
+      }),
+    );
+
+    res.status(201).send("login successfully");
+  } catch (error) {
+    console.log(error);
+
+    return res.status(400).send("please try again");
+  }
+};
+
+export { LoginMiddleware, SignupMiddleware, GoogleMiddleware };

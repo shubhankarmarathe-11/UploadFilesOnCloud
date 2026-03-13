@@ -1,5 +1,6 @@
 import { UserDetail, UserFileConnection } from "./user.model.js";
 import bcrypt from "bcryptjs";
+import { RedisCli } from "../../RedisConnection.js";
 
 const CreateDocument = async ({ name, email, mob, password }) => {
   let createUser;
@@ -39,6 +40,32 @@ const CreateDocument = async ({ name, email, mob, password }) => {
   }
 };
 
+const CreateUserwithGoogle = async ({ email, name, picture, sub }) => {
+  let createUser;
+  try {
+    createUser = await UserDetail.create({
+      Name: name,
+      Email: email,
+      ProfileUrl: picture,
+      GoogleId: sub,
+    });
+    const CreateFileConnection = await UserFileConnection.create({
+      UserId: createUser._id,
+    });
+
+    (await createUser).UserConnectionId = CreateFileConnection._id;
+    (await createUser).save();
+    return createUser;
+  } catch (error) {
+    console.log(error);
+
+    if (createUser?._id) {
+      await UserDetail.deleteOne({ _id: createUser?._id });
+    }
+    return null;
+  }
+};
+
 const LoginUser = async ({ email, password }) => {
   try {
     let FindUser = await UserDetail.findOne({ Email: email });
@@ -53,23 +80,88 @@ const LoginUser = async ({ email, password }) => {
   }
 };
 
-const UpdateStorageLimit = async ({ userId, filesize }) => {
+const bytesToMB = (bytes) => (bytes / (1024 * 1024)).toFixed(2);
+
+const UpdateStorageLimit = async ({ userId, filesize, RToken, operation }) => {
   try {
-    let UpdateStorage = await UserDetail.findById(userId);
-    if (UpdateStorage != null) {
-      UpdateStorage.storage_used_bytes =
-        (await UpdateStorage.storage_used_bytes) + Number(filesize);
-      UpdateStorage.Storagelimit_bytes =
-        (await UpdateStorage.Storagelimit_bytes) - Number(filesize);
+    if (operation == "upload") {
+      let UpdateStorage = await UserDetail.findById(userId, { Password: 0 });
+      if (UpdateStorage != null) {
+        UpdateStorage.storage_used_bytes =
+          (await UpdateStorage.storage_used_bytes) + Number(filesize);
+        UpdateStorage.Storagelimit_bytes =
+          (await UpdateStorage.Storagelimit_bytes) - Number(filesize);
 
-      UpdateStorage.save();
-      return 200;
+        await UpdateStorage.save();
+
+        await RedisCli.del(String(RToken));
+        await RedisCli.set(
+          String(RToken),
+          JSON.stringify({
+            _id: UpdateStorage._id,
+            name: UpdateStorage.Name,
+            email: UpdateStorage.Email,
+            mob: UpdateStorage.Number,
+            profileimg: UpdateStorage.ProfileUrl,
+            storage_used: await bytesToMB(UpdateStorage.storage_used_bytes),
+            storage_remain: await bytesToMB(UpdateStorage.Storagelimit_bytes),
+          }),
+        );
+
+        return 200;
+      }
+
+      return 404;
+    } else {
+      let UpdateStorage = await UserDetail.findById(userId, { Password: 0 });
+      if (UpdateStorage != null) {
+        UpdateStorage.storage_used_bytes =
+          (await UpdateStorage.storage_used_bytes) - Number(filesize);
+        UpdateStorage.Storagelimit_bytes =
+          (await UpdateStorage.Storagelimit_bytes) + Number(filesize);
+
+        await UpdateStorage.save();
+
+        await RedisCli.del(String(RToken));
+        await RedisCli.set(
+          String(RToken),
+          JSON.stringify({
+            _id: UpdateStorage._id,
+            name: UpdateStorage.Name,
+            email: UpdateStorage.Email,
+            mob: UpdateStorage.Number,
+            profileimg: UpdateStorage.ProfileUrl,
+            storage_used: await bytesToMB(UpdateStorage.storage_used_bytes),
+            storage_remain: await bytesToMB(UpdateStorage.Storagelimit_bytes),
+          }),
+        );
+
+        return 200;
+      }
+
+      return 404;
     }
-
-    return 404;
   } catch (error) {
     return null;
   }
 };
 
-export { CreateDocument, LoginUser, UpdateStorageLimit };
+const FindUserWithEmail = async ({ Email }) => {
+  try {
+    let FetchDetails = await UserDetail.findOne({ Email: Email });
+    if (FetchDetails == null) return 404;
+
+    return FetchDetails;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+export {
+  CreateDocument,
+  LoginUser,
+  UpdateStorageLimit,
+  FindUserWithEmail,
+  CreateUserwithGoogle,
+};

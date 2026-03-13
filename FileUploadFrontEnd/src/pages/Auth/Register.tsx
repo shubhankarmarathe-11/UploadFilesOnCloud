@@ -19,6 +19,7 @@ import axios from "axios";
 import ToastFun from "@/components/Toast";
 import { Spinner } from "@/components/ui/spinner";
 import { useLoggedIn } from "@/Store/authStore";
+import GoogleLoginButton from "./GoogleLoginButton";
 
 const Register = () => {
   const [Cred, SetCred] = useState({
@@ -187,6 +188,13 @@ const Register = () => {
             <Field orientation="horizontal">
               <Button type="submit">Register </Button>
               <Link to={"/login"}>Login</Link>
+            </Field>
+
+            <Field
+              orientation="horizontal"
+              className="flex justify-center items-center"
+            >
+              <GoogleLoginButton />
             </Field>
           </FieldGroup>
         </form>

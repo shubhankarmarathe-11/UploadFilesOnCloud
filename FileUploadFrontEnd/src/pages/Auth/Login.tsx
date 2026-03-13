@@ -14,6 +14,7 @@ import ToastFun from "@/components/Toast";
 import { Toaster } from "react-hot-toast";
 import { Spinner } from "@/components/ui/spinner";
 import { useLoggedIn } from "@/Store/authStore";
+import GoogleLoginButton from "./GoogleLoginButton";
 
 const Login = () => {
   const [Cred, SetCred] = useState({ email: "", password: "" });
@@ -147,6 +148,13 @@ const Login = () => {
             <Field orientation="horizontal">
               <Button type="submit">Login</Button>
               <Link to={"/register"}>Register</Link>
+            </Field>
+
+            <Field
+              orientation="horizontal"
+              className="flex justify-center items-center"
+            >
+              <GoogleLoginButton />
             </Field>
           </FieldGroup>
         </form>

@@ -1,6 +1,14 @@
 import express from "express";
-import { LoginMiddleware, SignupMiddleware } from "./auth.middleware.js";
-import { LoginController, SignupController } from "./auth.controller.js";
+import {
+  LoginMiddleware,
+  SignupMiddleware,
+  GoogleMiddleware,
+} from "./auth.middleware.js";
+import {
+  LoginController,
+  SignupController,
+  GoogleController,
+} from "./auth.controller.js";
 import { RedisCli } from "../../RedisConnection.js";
 
 const authRoute = express.Router();
@@ -8,6 +16,8 @@ const authRoute = express.Router();
 authRoute.post("/auth/login", LoginMiddleware, LoginController);
 
 authRoute.post("/auth/signup", SignupMiddleware, SignupController);
+
+authRoute.post("/auth/googleauth", GoogleMiddleware, GoogleController);
 
 authRoute.post("/auth/update", async (req, res) => {
   //

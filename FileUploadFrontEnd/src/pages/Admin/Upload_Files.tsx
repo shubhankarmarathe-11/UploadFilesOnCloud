@@ -20,8 +20,12 @@ import { useLoggedIn } from "@/Store/authStore";
 import { useNavigate } from "react-router-dom";
 
 const Upload_Files = () => {
+  const bytesToMB = (bytes) => (bytes / (1024 * 1024)).toFixed(2);
+
   const islogged = useLoggedIn((s) => s.islogged);
   const setLoggedIn = useLoggedIn((s) => s.setLoggedIn);
+
+  const [refreshPage, SetrefreshPage] = useState(false);
 
   const [progress, SetProgress] = useState(0);
 
@@ -42,7 +46,6 @@ const Upload_Files = () => {
       .get("/api/global/refresh", { withCredentials: true })
       .then((res) => {
         if (res.status == 201) {
-          UploadFileFun();
         }
       })
 
@@ -81,6 +84,7 @@ const Upload_Files = () => {
             ToastFun({ type: "success", message: res.data });
             formData.delete("file");
             SetProgress(0);
+            SetrefreshPage(!refreshPage);
           }
           SetProgress(0);
         })
@@ -105,12 +109,16 @@ const Upload_Files = () => {
         console.log(res.data.data);
         SetfilesData(res.data.data);
       })
-      .catch((err) => {});
+      .catch((err) => {
+        if (err.response.status == 401) {
+          AccessToken();
+        }
+      });
   }
 
   useEffect(() => {
     FetchFilesData();
-  }, []);
+  }, [refreshPage]);
 
   return (
     <>
@@ -162,13 +170,15 @@ const Upload_Files = () => {
           <TableBody className="overflow-auto">
             {filesData.map((val) => {
               return (
-                <TableRow key={val._id}>
+                <TableRow key={val._fileid}>
                   <TableCell className="font-medium">
-                    {val.originalname}
+                    {val.Data.originalname}
                   </TableCell>
-                  <TableCell>{val.mimetype}</TableCell>
-                  <TableCell>{val.datetime}</TableCell>
-                  <TableCell className="text-right">{val.size}</TableCell>
+                  <TableCell>{val.Data.mimetype}</TableCell>
+                  <TableCell>{val.DateTime}</TableCell>
+                  <TableCell className="text-right">
+                    {val.Data.size} bytes
+                  </TableCell>
                 </TableRow>
               );
             })}

@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ToastFun from "@/components/Toast";
 import { Toaster } from "react-hot-toast";
+import { FilesList } from "./Files";
 
 const Admin = () => {
   const [AdminComponentRender, SetComponentRender] = useState({
@@ -128,6 +129,7 @@ const Admin = () => {
         <div className="flex-1 p-5 w-full ">
           {AdminComponentRender.upload ? <Upload_Files /> : null}
           {AdminComponentRender.profile ? <Profile /> : null}
+          {AdminComponentRender.files ? <FilesList /> : null}
         </div>
       </div>
     </>
