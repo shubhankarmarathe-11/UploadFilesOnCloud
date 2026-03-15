@@ -45,6 +45,8 @@ const FileUploadController = async (req, res) => {
 
     upload.single("file")(req, res, async function (err) {
       if (err) {
+        console.log(err);
+
         return res.status(400).send("Upload error");
       }
 

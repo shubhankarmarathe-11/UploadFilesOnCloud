@@ -84,10 +84,9 @@ async function SignupController(req, res) {
     if (createUser == 406)
       return res.status(406).send("please use another email/number");
 
-    await fs.mkdir(
-      path.join(__dirname, "../../uploads", String(createUser._id)),
-      { recursive: true },
-    );
+    await fs.mkdir(path.join(__dirname, "../uploads", String(createUser._id)), {
+      recursive: true,
+    });
 
     let { Atoken, Rtoken } = await SignToken(String(createUser._id));
 
@@ -141,10 +140,9 @@ async function GoogleController(req, res) {
       sub: sub,
     });
     if (createUser == null) return res.status(400).send("please try again");
-    await fs.mkdir(
-      path.join(__dirname, "../../uploads", String(createUser._id)),
-      { recursive: true },
-    );
+    await fs.mkdir(path.join(__dirname, "../uploads", String(createUser._id)), {
+      recursive: true,
+    });
 
     let { Atoken, Rtoken } = await SignToken(String(createUser._id));
 

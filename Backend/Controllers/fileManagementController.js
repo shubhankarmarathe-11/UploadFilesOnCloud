@@ -28,7 +28,7 @@ async function FilePreviewController(req, res) {
 
     const filePath = path.join(
       __dirname,
-      `../../uploads/${result._id}`,
+      `../uploads/${result._id}`,
       req.params.filename,
     );
 
@@ -54,7 +54,7 @@ async function FileDownloadController(req, res) {
 
     const filePath = path.join(
       __dirname,
-      `../../uploads/${result._id}`,
+      `../uploads/${result._id}`,
       req.params.filename,
     );
 
