@@ -5,14 +5,19 @@ import { VerifyToken } from "../../utils/TokenOperations.js";
 async function GetUserProfile(req, res) {
   try {
     const refreshToken = await req.cookies.host_auth_refresh;
-    let Result = await RedisCli.get(String(refreshToken));
+
+    let r = await VerifyToken(String(refreshToken));
+
+    if (r.payload.type != "refresh" || r == undefined) {
+      res.clearCookie("host_auth_access");
+      res.clearCookie("host_auth_refresh");
+      return res.status(401).json({ message: "Invalid token" });
+    }
+
+    let Result = await RedisCli.get(r.payload.userId);
 
     if (Result == null) {
-      let token = await VerifyToken(refreshToken);
-      if (token.payload == undefined) {
-        return res.status(409).send("Token expired");
-      }
-      let FindUser = await UserDetail.findById(token.payload.userId, {
+      let FindUser = await UserDetail.findById(r.payload.userId, {
         storage_used_bytes: 1,
         Storagelimit_bytes: 1,
       });

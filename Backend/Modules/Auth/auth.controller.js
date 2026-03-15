@@ -50,7 +50,7 @@ async function LoginController(req, res) {
     });
 
     await RedisCli.set(
-      `${Rtoken}`,
+      `${result._id}`,
       JSON.stringify({
         _id: result._id,
         name: result.Name,
@@ -110,7 +110,7 @@ async function SignupController(req, res) {
     });
 
     await RedisCli.set(
-      `${Rtoken}`,
+      `${createUser._id}`,
       JSON.stringify({
         _id: createUser._id,
         name: createUser.Name,
@@ -167,7 +167,7 @@ async function GoogleController(req, res) {
     });
 
     await RedisCli.set(
-      `${Rtoken}`,
+      `${createUser._id}`,
       JSON.stringify({
         _id: createUser._id,
         name: createUser.Name,

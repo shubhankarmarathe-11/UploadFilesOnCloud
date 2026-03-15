@@ -10,6 +10,7 @@ import {
   GoogleController,
 } from "./auth.controller.js";
 import { RedisCli } from "../../RedisConnection.js";
+import { VerifyToken } from "../../utils/TokenOperations.js";
 
 const authRoute = express.Router();
 
@@ -31,10 +32,12 @@ authRoute.post("/auth/logout", async (req, res) => {
   try {
     const refreshToken = await req.cookies.host_auth_refresh;
 
-    let Result = await RedisCli.get(`${refreshToken}`);
+    let result = await VerifyToken(String(refreshToken));
 
-    await RedisCli.del(`${refreshToken}`);
-    await RedisCli.del(`${Result._id}_FilesData`);
+    let Result = await RedisCli.get(`${result.payload.userId}`);
+
+    await RedisCli.del(`${Result}`);
+    await RedisCli.del(`${Result}_FilesData`);
 
     res.clearCookie("host_auth_access");
     res.clearCookie("host_auth_refresh");

@@ -7,6 +7,7 @@ import {
 } from "./file.services.js";
 import fs from "fs";
 import path from "path";
+import { VerifyToken } from "../../utils/TokenOperations.js";
 
 const __dirname = import.meta.dirname;
 
@@ -14,7 +15,15 @@ const FileUploadController = async (req, res) => {
   try {
     const RToken = req.cookies.host_auth_refresh;
 
-    let result = JSON.parse(await RedisCli.get(String(RToken)));
+    let r = await VerifyToken(String(RToken));
+
+    if (r.payload.type != "refresh" || r == undefined) {
+      res.clearCookie("host_auth_access");
+      res.clearCookie("host_auth_refresh");
+      return res.status(401).json({ message: "Invalid token" });
+    }
+
+    let result = JSON.parse(await RedisCli.get(r.payload.userId));
 
     const storage = multer.diskStorage({
       destination: function (req, file, cb) {
@@ -71,9 +80,17 @@ const FetchFilesController = async (req, res) => {
   try {
     const RToken = req.cookies.host_auth_refresh;
 
-    let result = JSON.parse(await RedisCli.get(String(RToken)));
+    let r = await VerifyToken(String(RToken));
 
-    let Data = JSON.parse(await RedisCli.get(`${result._id}_FilesData`));
+    if (r.payload.type != "refresh" || r == undefined) {
+      res.clearCookie("host_auth_access");
+      res.clearCookie("host_auth_refresh");
+      return res.status(401).json({ message: "Invalid token" });
+    }
+
+    let result = JSON.parse(await RedisCli.get(r.payload.userId));
+
+    let Data = JSON.parse(await RedisCli.get(`${r.payload.userId}_FilesData`));
 
     if (Data != null && Data.length > 0) {
       return res.status(200).send({ data: Data });
@@ -99,7 +116,15 @@ const DeleteFileController = async (req, res) => {
 
     console.log(fileid);
 
-    let result = JSON.parse(await RedisCli.get(String(RToken)));
+    let r = await VerifyToken(String(RToken));
+
+    if (r.payload.type != "refresh" || r == undefined) {
+      res.clearCookie("host_auth_access");
+      res.clearCookie("host_auth_refresh");
+      return res.status(401).json({ message: "Invalid token" });
+    }
+
+    let result = JSON.parse(await RedisCli.get(r.payload.userId));
 
     let UpdateInDb = await UpdateModelAfterDelete({
       userId: result._id,

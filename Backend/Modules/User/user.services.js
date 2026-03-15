@@ -94,9 +94,9 @@ const UpdateStorageLimit = async ({ userId, filesize, RToken, operation }) => {
 
         await UpdateStorage.save();
 
-        await RedisCli.del(String(RToken));
+        await RedisCli.del(String(userId));
         await RedisCli.set(
-          String(RToken),
+          String(userId),
           JSON.stringify({
             _id: UpdateStorage._id,
             name: UpdateStorage.Name,
@@ -122,9 +122,9 @@ const UpdateStorageLimit = async ({ userId, filesize, RToken, operation }) => {
 
         await UpdateStorage.save();
 
-        await RedisCli.del(String(RToken));
+        await RedisCli.del(userId);
         await RedisCli.set(
-          String(RToken),
+          String(userId),
           JSON.stringify({
             _id: UpdateStorage._id,
             name: UpdateStorage.Name,

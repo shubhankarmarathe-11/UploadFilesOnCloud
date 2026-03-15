@@ -19,7 +19,7 @@ async function isLoggedin(req, res) {
       return res.status(409).send("token expired");
     }
 
-    let r = await RedisCli.get(String(refreshToken));
+    let r = await RedisCli.get(String(result.payload.userId));
 
     if (r == null) {
       res.clearCookie("host_auth_access");

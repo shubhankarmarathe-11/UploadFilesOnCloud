@@ -14,7 +14,7 @@ async function RTokenController(req, res) {
 
     const { Atoken } = await SignAToken(result.payload.userId);
     if (Atoken == undefined) {
-      await RedisCli.del(`${refreshToken}`);
+      await RedisCli.del(`${result.payload.userId}`);
       res.clearCookie("host_auth_access");
       res.clearCookie("host_auth_refresh");
       return res.status(401).send("please try again");

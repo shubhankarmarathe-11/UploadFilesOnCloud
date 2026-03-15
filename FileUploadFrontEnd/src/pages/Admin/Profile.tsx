@@ -41,8 +41,9 @@ const Profile = () => {
     <>
       <div className="flex-1 h-screen flex flex-col gap-8 items-center justify-center">
         <img
-          className="border border-black rounded-full w-48"
+          className="border border-black rounded-full w-48 h-48 flex justify-center items-center"
           src={userData.profileimg}
+          alt="Profile img"
         />
 
         <Card className="w-3/5">
