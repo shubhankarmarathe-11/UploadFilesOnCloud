@@ -15,7 +15,7 @@ export default function GoogleLoginButton() {
       setTimeout(() => {
         Navigate("/dashboard");
       }, 2000);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error:", err);
       return ToastFun({ type: "error", message: err.response.data });
     }

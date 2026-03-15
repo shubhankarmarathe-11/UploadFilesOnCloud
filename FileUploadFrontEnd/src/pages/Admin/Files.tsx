@@ -27,7 +27,7 @@ const renderPreview = (file: any) => {
   }
 
   if (file.Data.mimetype.startsWith("audio/")) {
-    return <audio src={url} controls className="w-full" />;
+    return <audio src={url} controls className="w-full h-32 rounded" />;
   }
 
   // fallback preview
@@ -43,7 +43,6 @@ function FilesList() {
 
   const [refresh, Setrefresh] = useState(false);
 
-  const islogged = useLoggedIn((s) => s.islogged);
   const setLoggedIn = useLoggedIn((s) => s.setLoggedIn);
 
   const Navigation = useNavigate();
@@ -78,7 +77,7 @@ function FilesList() {
       });
   }
 
-  const DownloadFileBtn = async (filename) => {
+  const DownloadFileBtn = async (filename: any) => {
     await axios
       .get(`/api/global/deletefile/${filename}`, {
         withCredentials: true,
@@ -100,7 +99,7 @@ function FilesList() {
       });
   };
 
-  const DeleteFileBtn = async (filename, fileid, filesize) => {
+  const DeleteFileBtn = async (filename: any, fileid: any, filesize: any) => {
     await axios
       .delete(`/api/file/deletefiles/${fileid}/${filename}/${filesize}`, {
         withCredentials: true,
@@ -129,11 +128,11 @@ function FilesList() {
             <h1 className="text-2xl">Files not Found</h1>
           </>
         ) : (
-          files.map((file) => {
+          files.map((file: any) => {
             return (
               <Card
                 key={file._fileid}
-                className="cursor-pointer hover:shadow-lg w-96"
+                className="cursor-pointer hover:shadow-lg w-96 h-96 overflow-y-auto"
               >
                 <CardContent className="p-2 border-2  border-gray-400 rounded-md m-5">
                   {renderPreview(file)}

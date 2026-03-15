@@ -1,16 +1,8 @@
-import React, { useEffect, useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -21,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 
 const Profile = () => {
-  const [userData, SetuserData] = useState({});
+  const [userData, SetuserData] = useState<any>({});
 
   const FetchDetails = async () => {
     await axios
@@ -30,7 +22,7 @@ const Profile = () => {
         console.log(res.data);
         SetuserData(res.data);
       })
-      .catch((err) => {});
+      .catch(() => {});
   };
 
   useEffect(() => {

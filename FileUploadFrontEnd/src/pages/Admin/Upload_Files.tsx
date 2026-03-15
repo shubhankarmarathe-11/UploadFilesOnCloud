@@ -20,9 +20,9 @@ import { useLoggedIn } from "@/Store/authStore";
 import { useNavigate } from "react-router-dom";
 
 const Upload_Files = () => {
-  const bytesToMB = (bytes) => (bytes / (1024 * 1024)).toFixed(2);
+  // const bytesToMB = (bytes: number) => (bytes / (1024 * 1024)).toFixed(2);
 
-  const islogged = useLoggedIn((s) => s.islogged);
+  // const islogged = useLoggedIn((s) => s.islogged);
   const setLoggedIn = useLoggedIn((s) => s.setLoggedIn);
 
   const [refreshPage, SetrefreshPage] = useState(false);
@@ -31,7 +31,7 @@ const Upload_Files = () => {
 
   const Navigation = useNavigate();
 
-  const [filesData, SetfilesData] = useState<[]>([]);
+  const [filesData, SetfilesData] = useState<any>([]);
 
   const [FileArray, SetFileArray] = useState<FileList | null>();
 
@@ -72,7 +72,7 @@ const Upload_Files = () => {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-          onUploadProgress: (progressEvent) => {
+          onUploadProgress: (progressEvent: any) => {
             const percentage = Math.round(
               (progressEvent.loaded * 100) / progressEvent.total,
             );
@@ -168,7 +168,7 @@ const Upload_Files = () => {
             </TableRow>
           </TableHeader>
           <TableBody className="overflow-auto">
-            {filesData.map((val) => {
+            {filesData.map((val: any) => {
               return (
                 <TableRow key={val._fileid}>
                   <TableCell className="font-medium">
