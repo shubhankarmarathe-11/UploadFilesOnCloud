@@ -85,7 +85,7 @@ async function SignupController(req, res) {
       return res.status(406).send("please use another email/number");
 
     await fs.mkdir(
-      path.join(__dirname, "../../../uploads", String(createUser._id)),
+      path.join(__dirname, "../../uploads", String(createUser._id)),
       { recursive: true },
     );
 
@@ -142,7 +142,7 @@ async function GoogleController(req, res) {
     });
     if (createUser == null) return res.status(400).send("please try again");
     await fs.mkdir(
-      path.join(__dirname, "../../../uploads", String(createUser._id)),
+      path.join(__dirname, "../../uploads", String(createUser._id)),
       { recursive: true },
     );
 

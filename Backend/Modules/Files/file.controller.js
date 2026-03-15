@@ -27,10 +27,7 @@ const FileUploadController = async (req, res) => {
 
     const storage = multer.diskStorage({
       destination: function (req, file, cb) {
-        cb(
-          null,
-          path.join(__dirname, `../../../uploads/${String(result._id)}`),
-        );
+        cb(null, path.join(__dirname, `../../uploads/${String(result._id)}`));
       },
 
       filename: function (req, file, cb) {
@@ -60,7 +57,7 @@ const FileUploadController = async (req, res) => {
       if (UpdateInDb == null || UpdateInDb == 400) {
         const filePath = path.join(
           __dirname,
-          `../../../uploads/${result._id}/${req.file.filename}`,
+          `../../uploads/${result._id}/${req.file.filename}`,
         );
 
         await fs.promises.rm(filePath, { force: true });
@@ -140,7 +137,7 @@ const DeleteFileController = async (req, res) => {
 
     const filePath = path.join(
       __dirname,
-      `../../../uploads/${result._id}/${filename}`,
+      `../../uploads/${result._id}/${filename}`,
     );
 
     await fs.promises.rm(filePath, { force: true });
