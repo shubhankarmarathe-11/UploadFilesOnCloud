@@ -146,6 +146,22 @@ const UpdateStorageLimit = async ({ userId, filesize, RToken, operation }) => {
   }
 };
 
+const DeleteAccount = async ({ userId }) => {
+  try {
+    const userDelete = await UserDetail.deleteOne({ _id: userId });
+    if (!userDelete.deletedCount) return 400;
+
+    const fileDelete = await UserFileConnection.deleteOne({ UserId: userId });
+
+    if (!fileDelete.deletedCount) return 400;
+
+    return 200;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
 const FindUserWithEmail = async ({ Email }) => {
   try {
     let FetchDetails = await UserDetail.findOne({ Email: Email });
@@ -164,4 +180,5 @@ export {
   UpdateStorageLimit,
   FindUserWithEmail,
   CreateUserwithGoogle,
+  DeleteAccount,
 };

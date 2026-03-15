@@ -11,9 +11,16 @@ import {
 
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+import ToastFun from "@/components/Toast";
+import { Toaster } from "react-hot-toast";
+import { Spinner } from "@/components/ui/spinner";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const [userData, SetuserData] = useState<any>({});
+  const [Loading, SetLoading] = useState(false);
+
+  const Navigate = useNavigate();
 
   const FetchDetails = async () => {
     await axios
@@ -29,8 +36,34 @@ const Profile = () => {
     FetchDetails();
   }, []);
 
+  const OnClickDeleteAccount = async () => {
+    await axios
+      .delete("/api/user/deleteprofile", { withCredentials: true })
+
+      .then((res) => {
+        SetLoading(true);
+        ToastFun({ type: "success", message: res.data });
+        Navigate("/");
+      })
+
+      .catch((err: any) => {
+        ToastFun({ type: "error", message: err.response.data });
+      });
+  };
+
+  if (Loading)
+    return (
+      <>
+        <Toaster />
+        <div className="flex-1 h-screen flex items-center justify-center gap-6">
+          <Spinner className="size-16" />
+        </div>
+      </>
+    );
+
   return (
     <>
+      <Toaster />
       <div className="flex-1 h-screen flex flex-col gap-8 items-center justify-center">
         <img
           className="border border-black rounded-full w-48 h-48 flex justify-center items-center"
@@ -69,7 +102,9 @@ const Profile = () => {
               <p className="my-5 text-red-600 cursor-pointer">
                 Change Password
               </p>
-              <Button className="my-5">Delete Account</Button>
+              <Button className="my-5" onClick={OnClickDeleteAccount}>
+                Delete Account
+              </Button>
             </div>
           </CardContent>
         </Card>
