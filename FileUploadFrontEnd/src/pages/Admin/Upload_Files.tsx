@@ -113,6 +113,10 @@ const Upload_Files = () => {
         if (err.response.status == 401) {
           AccessToken();
         }
+        if (err.response.status == 406) {
+          setLoggedIn(false);
+          Navigation("/login");
+        }
       });
   }
 

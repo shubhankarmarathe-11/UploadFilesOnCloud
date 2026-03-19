@@ -1,7 +1,7 @@
 import { RedisCli } from "../../RedisConnection.js";
 import { UserDetail } from "./user.model.js";
 import { VerifyToken } from "../../utils/TokenOperations.js";
-import { DeleteAccount } from "./user.services.js";
+import { DeleteAccount, UpdateProfile } from "./user.services.js";
 
 import fs from "fs";
 import path from "path";
@@ -17,7 +17,7 @@ async function GetUserProfile(req, res) {
     if (r.payload.type != "refresh" || r == undefined) {
       res.clearCookie("host_auth_access");
       res.clearCookie("host_auth_refresh");
-      return res.status(401).json({ message: "Invalid token" });
+      return res.status(406).json({ message: "Invalid token" });
     }
 
     let Result = await RedisCli.get(r.payload.userId);
@@ -49,7 +49,7 @@ async function DeleteAccountController(req, res) {
     if (r.payload.type != "refresh" || r == undefined) {
       res.clearCookie("host_auth_access");
       res.clearCookie("host_auth_refresh");
-      return res.status(401).json({ message: "Invalid token" });
+      return res.status(406).json({ message: "Invalid token" });
     }
 
     let Result = await RedisCli.get(r.payload.userId);
@@ -87,4 +87,43 @@ async function DeleteAccountController(req, res) {
   }
 }
 
-export { GetUserProfile, DeleteAccountController };
+async function UpdateDetails(req, res) {
+  try {
+    const refreshToken = await req.cookies.host_auth_refresh;
+
+    let { password } = req.body;
+
+    const passwordRegex = /^[a-zA-Z0-9]{8,}$/;
+
+    if (!passwordRegex.test(String(password)))
+      return res
+        .status(400)
+        .send(
+          "password must contain alphabets and numbers and length must be grater than 8",
+        );
+
+    let r = await VerifyToken(String(refreshToken));
+
+    if (r.payload.type != "refresh" || r == undefined) {
+      res.clearCookie("host_auth_access");
+      res.clearCookie("host_auth_refresh");
+      return res.status(406).json({ message: "Invalid token" });
+    }
+    let Result = JSON.parse(await RedisCli.get(r.payload.userId));
+
+    let Update = await UpdateProfile({
+      userId: Result._id,
+      password: password,
+    });
+
+    if (Update == 404 || Update == null)
+      return res.status(400).send("please try again");
+
+    return res.status(200).send("password updated");
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("please try again");
+  }
+}
+
+export { GetUserProfile, DeleteAccountController, UpdateDetails };

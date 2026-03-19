@@ -4,6 +4,8 @@ const AccessTokenMiddleware = async (req, res, next) => {
   try {
     const accessToken = await req.cookies.host_auth_access;
 
+    console.log("token", accessToken);
+
     if (accessToken == undefined)
       return res.status(401).json({ message: "Invalid token 0" });
 

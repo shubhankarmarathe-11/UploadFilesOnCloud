@@ -106,7 +106,7 @@ const Admin = () => {
           <p
             onClick={async () => {
               await axios
-                .post("/api/auth/logout", {}, { withCredentials: true })
+                .get("/api/auth/logout", { withCredentials: true })
                 .then((res) => {
                   if (res.status == 201) {
                     setLoading(true);

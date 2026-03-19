@@ -3,7 +3,7 @@ import {
   LoginUser,
   CreateUserwithGoogle,
 } from "../User/user.services.js";
-import { SignToken } from "../../utils/TokenOperations.js";
+import { SignToken, VerifyToken } from "../../utils/TokenOperations.js";
 import { RedisCli } from "../../RedisConnection.js";
 import fs from "fs/promises";
 import path from "path";
@@ -189,11 +189,30 @@ async function GoogleController(req, res) {
   }
 }
 
-async function UpdateController(req, res) {}
+async function LogoutController(req, res) {
+  try {
+    const refreshToken = await req.cookies.host_auth_refresh;
+
+    let result = await VerifyToken(String(refreshToken));
+
+    let Result = await RedisCli.get(`${result.payload.userId}`);
+
+    await RedisCli.del(`${Result}`);
+    await RedisCli.del(`${Result}_FilesData`);
+
+    res.clearCookie("host_auth_access");
+    res.clearCookie("host_auth_refresh");
+
+    res.status(201).send("success");
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("please try again");
+  }
+}
 
 export {
   LoginController,
   SignupController,
   GoogleController,
-  UpdateController,
+  LogoutController,
 };

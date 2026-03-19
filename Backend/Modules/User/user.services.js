@@ -174,6 +174,25 @@ const FindUserWithEmail = async ({ Email }) => {
   }
 };
 
+const UpdateProfile = async ({ userId, password }) => {
+  try {
+    let hashpass = await bcrypt.hash(String(password), 10);
+    if (!hashpass) return null;
+
+    let UpdateDetails = await UserDetail.updateOne(
+      { _id: userId },
+      { Password: hashpass },
+    );
+    if (UpdateDetails.modifiedCount == 1) {
+      return 200;
+    }
+
+    return 404;
+  } catch (error) {
+    return null;
+  }
+};
+
 export {
   CreateDocument,
   LoginUser,
@@ -181,4 +200,5 @@ export {
   FindUserWithEmail,
   CreateUserwithGoogle,
   DeleteAccount,
+  UpdateProfile,
 };
