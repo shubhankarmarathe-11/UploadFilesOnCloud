@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     host: true,
     proxy: {
-      "/api/": "https://project1.shubhankarmarathe.online",
+      "/api/": "http://locahost:3000/",
     },
   },
   plugins: [react()],

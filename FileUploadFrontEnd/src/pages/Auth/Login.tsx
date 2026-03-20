@@ -17,6 +17,7 @@ import { useLoggedIn } from "@/Store/authStore";
 import GoogleLoginButton from "./GoogleLoginButton";
 
 const Login = () => {
+  const API = import.meta.env.VITE_API_URL;
   const [Cred, SetCred] = useState({ email: "", password: "" });
   const [show, Setshow] = useState(false);
 
@@ -26,7 +27,7 @@ const Login = () => {
 
   const SubmitForm = async () => {
     await axios
-      .post("/api/auth/login", {
+      .post(`${API}/api/auth/login`, {
         email: Cred.email,
         password: Cred.password,
       })
@@ -49,7 +50,7 @@ const Login = () => {
 
   const FetchIsLoggedIn = async () => {
     await axios
-      .get("/api/global/isLoggedin", { withCredentials: true })
+      .get(`${API}/api/global/isLoggedin`, { withCredentials: true })
       .then((res) => {
         if (res.status == 200) {
           setLoggedIn(true);

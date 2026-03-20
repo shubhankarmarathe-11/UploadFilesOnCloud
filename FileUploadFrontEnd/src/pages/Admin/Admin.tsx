@@ -10,6 +10,7 @@ import { Toaster } from "react-hot-toast";
 import { FilesList } from "./Files";
 
 const Admin = () => {
+  const API = import.meta.env.VITE_API_URL;
   const [AdminComponentRender, SetComponentRender] = useState({
     upload: true,
     files: false,
@@ -25,7 +26,7 @@ const Admin = () => {
 
   const FetchIsLoggedIn = async () => {
     await axios
-      .get("/api/global/isLoggedin", { withCredentials: true })
+      .get(`${API}/api/global/isLoggedin`, { withCredentials: true })
       .then((res) => {
         if (res.status == 200) {
           setLoggedIn(true);
@@ -106,7 +107,7 @@ const Admin = () => {
           <p
             onClick={async () => {
               await axios
-                .get("/api/auth/logout", { withCredentials: true })
+                .get(`${API}/api/auth/logout`, { withCredentials: true })
                 .then((res) => {
                   if (res.status == 201) {
                     setLoading(true);

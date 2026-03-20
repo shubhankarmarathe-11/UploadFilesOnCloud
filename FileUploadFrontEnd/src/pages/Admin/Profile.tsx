@@ -27,6 +27,7 @@ import { useLoggedIn } from "@/Store/authStore";
 import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
+  const API = import.meta.env.VITE_API_URL;
   const [userData, SetuserData] = useState<any>({});
   const [Loading, SetLoading] = useState(false);
 
@@ -49,7 +50,7 @@ const Profile = () => {
 
   async function AccessToken() {
     await axios
-      .get("/api/global/refresh", { withCredentials: true })
+      .get(`${API}/api/global/refresh`, { withCredentials: true })
       .then((res) => {
         if (res.status == 201) {
           return ToastFun({ type: "success", message: "try again" });
@@ -66,7 +67,7 @@ const Profile = () => {
 
   const FetchDetails = async () => {
     await axios
-      .get("/api/user/getprofile")
+      .get(`${API}/api/user/getprofile`)
       .then((res) => {
         console.log(res.data);
         SetuserData(res.data);
@@ -76,7 +77,7 @@ const Profile = () => {
 
   const OnClickDeleteAccount = async () => {
     await axios
-      .delete("/api/user/deleteprofile", { withCredentials: true })
+      .delete(`${API}/api/user/deleteprofile`, { withCredentials: true })
 
       .then((res) => {
         SetLoading(true);
@@ -98,7 +99,7 @@ const Profile = () => {
     // SetLoading(true);
     await axios
       .patch(
-        "/api/user/updateprofile",
+        `${API}/api/user/updateprofile`,
         { password: PasswordCard.password },
         { withCredentials: true },
       )

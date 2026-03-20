@@ -23,6 +23,7 @@ const Upload_Files = () => {
   // const bytesToMB = (bytes: number) => (bytes / (1024 * 1024)).toFixed(2);
 
   // const islogged = useLoggedIn((s) => s.islogged);
+  const API = import.meta.env.VITE_API_URL;
   const setLoggedIn = useLoggedIn((s) => s.setLoggedIn);
 
   const [refreshPage, SetrefreshPage] = useState(false);
@@ -43,7 +44,7 @@ const Upload_Files = () => {
 
   async function AccessToken() {
     await axios
-      .get("/api/global/refresh", { withCredentials: true })
+      .get(`${API}/api/global/refresh`, { withCredentials: true })
       .then((res) => {
         if (res.status == 201) {
         }
@@ -67,7 +68,7 @@ const Upload_Files = () => {
       formData.append("file", val);
 
       await axios
-        .post("/api/file/uploadfile", formData, {
+        .post(`${API}/api/file/uploadfile`, formData, {
           withCredentials: true,
           headers: {
             "Content-Type": "multipart/form-data",
@@ -104,7 +105,7 @@ const Upload_Files = () => {
 
   async function FetchFilesData() {
     await axios
-      .get("/api/file/fetchfiles", { withCredentials: true })
+      .get(`${API}/api/file/fetchfiles`, { withCredentials: true })
       .then((res) => {
         console.log(res.data.data);
         SetfilesData(res.data.data);

@@ -39,6 +39,7 @@ const renderPreview = (file: any) => {
 };
 
 function FilesList() {
+  const API = import.meta.env.VITE_API_URL;
   const [files, Setfiles] = useState<[]>([]);
 
   const [refresh, Setrefresh] = useState(false);
@@ -49,7 +50,7 @@ function FilesList() {
 
   async function AccessToken() {
     await axios
-      .get("/api/global/refresh", { withCredentials: true })
+      .get(`${API}/api/global/refresh`, { withCredentials: true })
       .then((res) => {
         if (res.status == 201) {
         }
@@ -65,7 +66,7 @@ function FilesList() {
 
   async function FetchFilesData() {
     await axios
-      .get("/api/file/fetchfiles", { withCredentials: true })
+      .get(`${API}/api/file/fetchfiles`, { withCredentials: true })
       .then((res) => {
         console.log(res.data.data);
         Setfiles(res.data.data);
@@ -84,7 +85,7 @@ function FilesList() {
 
   const DownloadFileBtn = async (filename: any) => {
     await axios
-      .get(`/api/global/deletefile/${filename}`, {
+      .get(`${API}/api/global/deletefile/${filename}`, {
         withCredentials: true,
         responseType: "blob",
       })
@@ -106,7 +107,7 @@ function FilesList() {
 
   const DeleteFileBtn = async (filename: any, fileid: any, filesize: any) => {
     await axios
-      .delete(`/api/file/deletefiles/${fileid}/${filename}/${filesize}`, {
+      .delete(`${API}/api/file/deletefiles/${fileid}/${filename}/${filesize}`, {
         withCredentials: true,
       })
       .then((res) => {
