@@ -11,9 +11,13 @@ export default function GoogleLoginButton() {
     const google_token = response.credential;
 
     try {
-      const res = await axios.post(`${API}/api/auth/googleauth`, {
-        google_token,
-      });
+      const res = await axios.post(
+        `${API}/api/auth/googleauth`,
+        {
+          google_token,
+        },
+        { withCredentials: true },
+      );
       ToastFun({ type: "success", message: res.data });
       setTimeout(() => {
         Navigate("/dashboard");

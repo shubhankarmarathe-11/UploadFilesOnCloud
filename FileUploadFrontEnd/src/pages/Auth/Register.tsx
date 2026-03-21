@@ -36,12 +36,16 @@ const Register = () => {
 
   const SubmitForm = async () => {
     await axios
-      .post(`${API}/api/auth/signup`, {
-        name: Cred.name,
-        email: Cred.email,
-        mob: Cred.number,
-        password: Cred.password,
-      })
+      .post(
+        `${API}/api/auth/signup`,
+        {
+          name: Cred.name,
+          email: Cred.email,
+          mob: Cred.number,
+          password: Cred.password,
+        },
+        { withCredentials: true },
+      )
       .then((res) => {
         if (res.status == 201) {
           setLoading(true);

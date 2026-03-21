@@ -27,10 +27,14 @@ const Login = () => {
 
   const SubmitForm = async () => {
     await axios
-      .post(`${API}/api/auth/login`, {
-        email: Cred.email,
-        password: Cred.password,
-      })
+      .post(
+        `${API}/api/auth/login`,
+        {
+          email: Cred.email,
+          password: Cred.password,
+        },
+        { withCredentials: true },
+      )
       .then((res) => {
         if (res.status == 201) {
           setLoading(true);

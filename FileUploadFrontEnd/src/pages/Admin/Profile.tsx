@@ -67,7 +67,7 @@ const Profile = () => {
 
   const FetchDetails = async () => {
     await axios
-      .get(`${API}/api/user/getprofile`)
+      .get(`${API}/api/user/getprofile`, { withCredentials: true })
       .then((res) => {
         console.log(res.data);
         SetuserData(res.data);
