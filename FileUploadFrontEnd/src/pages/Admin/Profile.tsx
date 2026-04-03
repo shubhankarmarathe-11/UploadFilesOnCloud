@@ -1,13 +1,5 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
