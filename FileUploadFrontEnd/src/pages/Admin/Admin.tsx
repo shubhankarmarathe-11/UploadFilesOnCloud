@@ -42,8 +42,6 @@ const Admin = () => {
   };
 
   useEffect(() => {
-    console.log(islogged);
-
     if (islogged) {
       setLoading(false);
     } else {

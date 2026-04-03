@@ -2,11 +2,9 @@ import { VerifyToken } from "../utils/TokenOperations.js";
 
 const AccessTokenMiddleware = async (req, res, next) => {
   try {
-    const accessToken = await req.cookies.host_auth_access;
+    const accessToken = req.cookies.host_auth_access;
 
-    console.log("token", accessToken);
-
-    if (accessToken == undefined)
+    if (!accessToken)
       return res.status(401).json({ message: "Invalid token 0" });
 
     let result = await VerifyToken(String(accessToken));

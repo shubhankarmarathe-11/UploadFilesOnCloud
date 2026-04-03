@@ -3,9 +3,18 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useLoggedIn } from "@/Store/authStore";
 import { useNavigate } from "react-router-dom";
-import { File } from "lucide-react";
+import { File, EllipsisVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "react-hot-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import ToastFun from "@/components/Toast";
 
@@ -68,7 +77,6 @@ function FilesList() {
     await axios
       .get(`${API}/api/file/fetchfiles`, { withCredentials: true })
       .then((res) => {
-        console.log(res.data.data);
         Setfiles(res.data.data);
       })
       .catch((err) => {
@@ -101,7 +109,7 @@ function FilesList() {
         link.remove();
       })
       .catch((err) => {
-        console.log(err);
+        ToastFun({ type: "error", message: err.response.data });
       });
   };
 
@@ -115,8 +123,6 @@ function FilesList() {
         Setrefresh(!refresh);
       })
       .catch((err) => {
-        console.log(err);
-
         ToastFun({ type: "error", message: err.response.data });
       });
   };
@@ -138,19 +144,69 @@ function FilesList() {
             return (
               <Card
                 key={file._fileid}
-                className="cursor-pointer hover:shadow-lg w-96 h-96 overflow-y-auto"
+                className="cursor-pointer hover:shadow-lg w-96 h-80 overflow-y-auto"
               >
                 <CardContent className="p-2 border-2  border-gray-400 rounded-md m-5">
                   {renderPreview(file)}
                 </CardContent>
 
                 <CardHeader>
-                  <CardTitle className="text-sm truncate">
-                    {file.Data.originalname}
+                  <CardTitle className="text-sm truncate flex justify-between items-center  gap-5">
+                    <p className="w-80">{file.Data.originalname}</p>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <span className="text-sm w-auto">
+                          <EllipsisVertical />
+                        </span>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="" align="start">
+                        <DropdownMenuGroup>
+                          <DropdownMenuLabel>File details</DropdownMenuLabel>
+                          <DropdownMenuItem className="flex items-center justify-between">
+                            <p>Type</p>
+                            <p className="w-80 text-right">
+                              {file.Data.mimetype}
+                            </p>
+                          </DropdownMenuItem>
+                          <DropdownMenuLabel></DropdownMenuLabel>
+                          <DropdownMenuItem>
+                            <p>Size</p>
+                            <p className="w-80 text-right">
+                              {(file.Data.size / 1024).toFixed(2)} KB
+                            </p>
+                          </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              DownloadFileBtn(file.Data.filename);
+                            }}
+                            className="text-red-500 cursor-pointer"
+                          >
+                            Download
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              DeleteFileBtn(
+                                file.Data.filename,
+                                file._fileid,
+                                file.Data.size,
+                              );
+                            }}
+                            className="text-red-500 cursor-pointer"
+                          >
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </CardTitle>
                 </CardHeader>
 
-                <CardContent>
+                <CardContent></CardContent>
+
+                {/* <CardContent>
                   <p>Type:</p>
                   <p className="text-sm">{file.Data.mimetype}</p>
 
@@ -181,7 +237,7 @@ function FilesList() {
                       Delete File
                     </h1>
                   </span>
-                </CardContent>
+                </CardContent> */}
               </Card>
             );
           })

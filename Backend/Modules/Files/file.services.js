@@ -32,6 +32,8 @@ const UploadFileModel = async ({ userId, filedata, RToken }) => {
   try {
     let date = new Date();
 
+    filedata.size;
+
     let CreateFileModel = await UserFileConnection.updateOne(
       { UserId: userId },
       {
@@ -59,6 +61,15 @@ const UploadFileModel = async ({ userId, filedata, RToken }) => {
         );
 
         return 400;
+      }
+
+      if (Update == 400) {
+        await UserFileConnection.updateOne(
+          { UserId: userId },
+          { $pull: { Files: { Data: filedata } } },
+        );
+
+        return 409;
       }
 
       await RedisCli.del(`${userId}_FilesData`);

@@ -3,8 +3,10 @@ import { RedisCli } from "../RedisConnection.js";
 
 async function isLoggedin(req, res) {
   try {
-    const refreshToken = await req.cookies.host_auth_refresh;
-    if (refreshToken == undefined) {
+    const refreshToken = req.cookies.host_auth_refresh;
+    console.log(refreshToken);
+
+    if (!refreshToken) {
       res.clearCookie("host_auth_access");
       res.clearCookie("host_auth_refresh");
       return res.status(409).send("token expired");

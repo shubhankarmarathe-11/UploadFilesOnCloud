@@ -57,8 +57,6 @@ const Register = () => {
         }
       })
       .catch((err) => {
-        console.log(err);
-
         return ToastFun({ type: "error", message: err.response.data });
       });
   };
@@ -87,8 +85,6 @@ const Register = () => {
   };
 
   useEffect(() => {
-    console.log(islogged);
-
     if (!islogged) {
       FetchIsLoggedIn();
     } else {

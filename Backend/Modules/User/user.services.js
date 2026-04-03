@@ -87,6 +87,8 @@ const UpdateStorageLimit = async ({ userId, filesize, RToken, operation }) => {
     if (operation == "upload") {
       let UpdateStorage = await UserDetail.findById(userId, { Password: 0 });
       if (UpdateStorage != null) {
+        if (filesize > UpdateStorage.Storagelimit_bytes) return 400;
+
         UpdateStorage.storage_used_bytes =
           (await UpdateStorage.storage_used_bytes) + Number(filesize);
         UpdateStorage.Storagelimit_bytes =

@@ -69,7 +69,6 @@ const Profile = () => {
     await axios
       .get(`${API}/api/user/getprofile`, { withCredentials: true })
       .then((res) => {
-        console.log(res.data);
         SetuserData(res.data);
       })
       .catch(() => {});
@@ -122,7 +121,7 @@ const Profile = () => {
     return (
       <>
         <Toaster />
-        <div className="flex-1 h-56 flex flex-col justify-center items-center">
+        <div className="flex-1 h-56 flex flex-col justify-center items-center mt-52">
           <form
             className="sm:w-2/6"
             onSubmit={(e) => {
@@ -233,32 +232,26 @@ const Profile = () => {
           alt="Profile img"
         />
 
-        <Card className="w-3/5">
-          <CardTitle className="text-center my-5">
+        <Card className="w-screen m-2 sm:w-3/5">
+          <CardTitle className="text-center my-5 flex flex-col gap-5">
             <h1 className="text-blue-600">Welcome</h1>
             {userData.name}
           </CardTitle>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="">Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Storage Used</TableHead>
-                  <TableHead className="">Storage Remain</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow key={userData._id}>
-                  <TableCell className="font-medium">{userData.name}</TableCell>
-                  <TableCell>{userData.email}</TableCell>
-                  <TableCell>{userData.storage_used} MB</TableCell>
-                  <TableCell className="">
-                    {userData.storage_remain} MB
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
+            <div className="flex text-sm items-center justify-center  w-full gap-10">
+              <span className="text-left m-5 font-bold">
+                <h1 className="py-2">Name </h1>
+                <h1 className="py-2">Email</h1>
+                <h1 className="py-2">Storage Used </h1>
+                <h1 className="py-2">Storage Remain </h1>
+              </span>
+              <span className="text-right">
+                <p className="py-2">{userData.name}</p>
+                <p className="py-2">{userData.email}</p>
+                <p className="py-2">{userData.storage_used} MB</p>
+                <p className="py-2">{userData.storage_remain} MB</p>
+              </span>
+            </div>
 
             <div className=" ">
               <p

@@ -8,8 +8,11 @@ import {
 import fs from "fs";
 import path from "path";
 import { VerifyToken } from "../../utils/TokenOperations.js";
+import { request, response } from "express";
 
 const __dirname = import.meta.dirname;
+
+const bytesToMB = (bytes) => (bytes / (1024 * 1024)).toFixed(2);
 
 const FileUploadController = async (req, res) => {
   try {
@@ -56,6 +59,8 @@ const FileUploadController = async (req, res) => {
         RToken: RToken,
       });
 
+      console.log(UpdateInDb);
+
       if (UpdateInDb == null || UpdateInDb == 400) {
         const filePath = path.join(
           __dirname,
@@ -66,12 +71,23 @@ const FileUploadController = async (req, res) => {
         return res.status(400).send("Upload error");
       }
 
-      res.status(201).send("File uploaded successfully");
+      if (UpdateInDb == 409) {
+        const filePath = path.join(
+          __dirname,
+          `../../uploads/${result._id}/${req.file.filename}`,
+        );
+
+        await fs.promises.rm(filePath, { force: true });
+
+        return res.status(400).send("File size exceeds the storage limit.");
+      }
+
+      return res.status(201).send("File uploaded successfully");
     });
   } catch (error) {
     console.log(error);
 
-    return res.status(400).send("please try again");
+    return res.status(500).send("please try again");
   }
 };
 
@@ -141,6 +157,8 @@ const DeleteFileController = async (req, res) => {
       __dirname,
       `../../uploads/${result._id}/${filename}`,
     );
+
+    console.log(filePath);
 
     await fs.promises.rm(filePath, { force: true });
 

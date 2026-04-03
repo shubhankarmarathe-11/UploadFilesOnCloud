@@ -2,6 +2,9 @@ import { RedisCli } from "../../RedisConnection.js";
 import { validateGoogleToken } from "../../utils/Validate0AuthToken.js";
 import { FindUserWithEmail } from "../User/user.services.js";
 import { SignToken } from "../../utils/TokenOperations.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const bytesToMB = (bytes) => (bytes / (1024 * 1024)).toFixed(2);
 
@@ -66,6 +69,7 @@ async function SignupMiddleware(req, res, next) {
 const GoogleMiddleware = async (req, res, next) => {
   try {
     let { google_token } = req.body;
+    const isProduction = process.env.NODE_ENV === "production";
 
     let r = await validateGoogleToken(google_token);
 
@@ -90,15 +94,15 @@ const GoogleMiddleware = async (req, res, next) => {
       path: "/",
       maxAge: 60 * 60 * 1000,
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: isProduction ? true : false,
+      sameSite: isProduction ? "none" : "lax",
     });
     res.cookie("host_auth_refresh", Rtoken, {
       path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: isProduction ? true : false,
+      sameSite: isProduction ? "none" : "lax",
     });
 
     await RedisCli.set(

@@ -41,13 +41,23 @@ const port = 3000 || process.env.Port;
 
 App.use(bodyParser.json());
 App.use(bodyParser.urlencoded({ extended: true }));
+
+const isProduction = process.env.NODE_ENV === "production";
+console.log(isProduction);
+
+App.set("trust proxy", 1);
+
 App.use(
   cors({
-    origin: "*",
+    origin: isProduction
+      ? "https://app.shubhankarmarathe.online"
+      : "http://localhost:5173/",
     methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
-    allowedHeaders: "*",
+    allowedHeaders: isProduction ? "" : "*",
+    credentials: isProduction ? true : false,
   }),
 );
+
 App.use(cookieParser());
 
 App.get("/", (req, res) => {

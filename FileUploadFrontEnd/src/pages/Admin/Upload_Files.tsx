@@ -64,7 +64,6 @@ const Upload_Files = () => {
       return ToastFun({ type: "error", message: "please select file first" });
 
     for (let val of FileArray) {
-      console.log(val);
       formData.append("file", val);
 
       await axios
@@ -90,7 +89,12 @@ const Upload_Files = () => {
           SetProgress(0);
         })
         .catch((err) => {
-          console.log(err.response.status);
+          if (err.response.status != 401) {
+            ToastFun({ type: "error", message: err.response.data });
+            formData.delete("file");
+            SetProgress(0);
+            SetrefreshPage(!refreshPage);
+          }
 
           if (err.response.status == 401) {
             AccessToken();
@@ -107,7 +111,6 @@ const Upload_Files = () => {
     await axios
       .get(`${API}/api/file/fetchfiles`, { withCredentials: true })
       .then((res) => {
-        console.log(res.data.data);
         SetfilesData(res.data.data);
       })
       .catch((err) => {
@@ -166,10 +169,10 @@ const Upload_Files = () => {
           <TableCaption>A list of Recent uploads files</TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead className="">Filename</TableHead>
-              <TableHead>type</TableHead>
-              <TableHead>DateTime</TableHead>
-              <TableHead className="text-right">Size</TableHead>
+              <TableHead className="text-center">Filename</TableHead>
+              <TableHead className="text-center">type</TableHead>
+              <TableHead className="text-center">DateTime</TableHead>
+              <TableHead className="text-center">Size</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody className="overflow-auto">

@@ -36,7 +36,7 @@ const UserDetails = new mongoose.Schema({
   },
   Number: {
     type: String,
-    unique: true,
+    default: "",
   },
   Password: {
     type: String,

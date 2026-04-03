@@ -18,6 +18,7 @@ import GoogleLoginButton from "./GoogleLoginButton";
 
 const Login = () => {
   const API = import.meta.env.VITE_API_URL;
+
   const [Cred, SetCred] = useState({ email: "", password: "" });
   const [show, Setshow] = useState(false);
 
@@ -70,8 +71,6 @@ const Login = () => {
   };
 
   useEffect(() => {
-    console.log(islogged);
-
     if (!islogged) {
       FetchIsLoggedIn();
     } else {

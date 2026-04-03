@@ -10,7 +10,7 @@ const __dirname = import.meta.dirname;
 
 async function GetUserProfile(req, res) {
   try {
-    const refreshToken = await req.cookies.host_auth_refresh;
+    const refreshToken = req.cookies.host_auth_refresh;
 
     let r = await VerifyToken(String(refreshToken));
 
@@ -42,7 +42,7 @@ async function GetUserProfile(req, res) {
 
 async function DeleteAccountController(req, res) {
   try {
-    const refreshToken = await req.cookies.host_auth_refresh;
+    const refreshToken = req.cookies.host_auth_refresh;
 
     let r = await VerifyToken(String(refreshToken));
 
@@ -89,7 +89,7 @@ async function DeleteAccountController(req, res) {
 
 async function UpdateDetails(req, res) {
   try {
-    const refreshToken = await req.cookies.host_auth_refresh;
+    const refreshToken = req.cookies.host_auth_refresh;
 
     let { password } = req.body;
 

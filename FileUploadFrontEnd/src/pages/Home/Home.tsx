@@ -116,7 +116,7 @@ const Home = () => {
           <h2 className="text-3xl sm:text-4xl text-center my-5">
             Why Choose Our Platform?
           </h2>
-          <span className="flex items-center gap-4 justify-between flex-wrap p-5">
+          <span className="flex flex-col sm:flex-row items-center gap-4 justify-between flex-wrap p-5">
             {features.map((features, index) => (
               <Card
                 key={index}
@@ -140,7 +140,7 @@ const Home = () => {
           <h2 className="text-3xl sm:text-4xl text-center my-5">
             Upload in 3 Simple Steps
           </h2>
-          <span className="flex gap-4 justify-between flex-wrap p-5">
+          <span className="flex flex-col sm:flex-row gap-4 justify-between flex-wrap p-5 items-center">
             {steps.map((step, index) => (
               <Card
                 key={index}
@@ -151,7 +151,7 @@ const Home = () => {
                   <CardTitle>{step.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription className="text-center">
+                  <CardDescription className="text-center w-80">
                     {step.description}
                   </CardDescription>
                 </CardContent>
@@ -165,7 +165,7 @@ const Home = () => {
           <h2 className="text-3xl sm:text-4xl text-center my-5">
             Start Uploading Your Files Today
           </h2>
-          <p className="text-center">
+          <p className="text-center w-96">
             Join our platform and experience smooth, secure, and powerful file
             management.
           </p>

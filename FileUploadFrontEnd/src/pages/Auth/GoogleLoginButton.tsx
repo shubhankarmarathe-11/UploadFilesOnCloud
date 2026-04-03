@@ -35,7 +35,7 @@ export default function GoogleLoginButton() {
       theme="filled_black"
       width={"auto"}
       onSuccess={handleSuccess}
-      onError={() => console.log("Login failed")}
+      onError={() => {}}
     />
   );
 }
