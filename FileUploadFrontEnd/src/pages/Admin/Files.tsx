@@ -18,7 +18,8 @@ import {
 import ToastFun from "@/components/Toast";
 
 const renderPreview = (file: any) => {
-  const url = `/api/global/file/${file.Data.filename}`; // your secure file route
+  const API = import.meta.env.VITE_API_URL;
+  const url = `${API}/api/global/file/${file.Data.filename}`; // your secure file route
 
   if (file.Data.mimetype.startsWith("image/")) {
     return (

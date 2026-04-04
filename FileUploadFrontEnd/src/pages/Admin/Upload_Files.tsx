@@ -64,6 +64,16 @@ const Upload_Files = () => {
       return ToastFun({ type: "error", message: "please select file first" });
 
     for (let val of FileArray) {
+      if (FileArray.length == 1 && val.size > 29000000) {
+        ToastFun({ type: "error", message: "File is too large to upload." });
+        return formData.delete("file");
+      }
+
+      if (val.size > 29000000) {
+        ToastFun({ type: "error", message: "File is too large to upload." });
+        continue;
+      }
+
       formData.append("file", val);
 
       await axios
