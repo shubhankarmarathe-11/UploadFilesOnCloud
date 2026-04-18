@@ -34,6 +34,8 @@ This project was created as a **portfolio project** to demonstrate the following
 
 ---
 
+
+
 # Project Structure
 
 This repository follows a **monorepo structure** with three main components.
