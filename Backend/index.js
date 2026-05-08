@@ -37,7 +37,7 @@ const ConnectDB = async () => {
 ConnectDB();
 
 const App = express();
-const port = 3000 || process.env.Port;
+const port = 3000 || process.env.PORT
 
 App.use(bodyParser.json());
 App.use(bodyParser.urlencoded({ extended: true }));
